@@ -22,7 +22,7 @@ class SocketService with ChangeNotifier {
   
   void _initConfig() {
     // Dart client
-    _socket = IO.io('http://localhost:3000', {
+    _socket = IO.io('https://example-flutter-advance.onrender.com', {
       'transports': ['websocket'],
       'autoConnect': true
     });

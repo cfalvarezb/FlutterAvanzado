@@ -197,7 +197,7 @@ class _HomePageState extends State<HomePage> {
         Colors.yellow[200]!,
     ];
 
-    return PieChart(
+    return ( dataMap.isEmpty ) ?  Text('No hay data') : PieChart(
       dataMap: dataMap,
       animationDuration: Duration(milliseconds: 800),
       chartLegendSpacing: 32,
