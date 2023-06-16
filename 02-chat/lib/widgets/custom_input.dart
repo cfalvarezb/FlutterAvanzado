@@ -27,7 +27,7 @@ class CustomInput extends StatelessWidget {
             borderRadius: BorderRadius.circular(30),
             boxShadow: [
               BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withOpacity(1),
                   offset: Offset(0, 5),
                   blurRadius: 5)
             ]),

@@ -17,14 +17,21 @@ class BotonAzul extends StatelessWidget {
             style: ButtonStyle( 
                 elevation: MaterialStateProperty.all(2),
                 backgroundColor: MaterialStatePropertyAll(Colors.black87),
-                shape: MaterialStatePropertyAll(StadiumBorder())
+                shape: MaterialStatePropertyAll(StadiumBorder()),
+                overlayColor: MaterialStateProperty.resolveWith<Color?>(
+                  (Set<MaterialState> states) {
+                    if (states.contains(MaterialState.pressed))
+                      return Colors.white70; //<-- SEE HERE
+                    return null; // Defer to the widget's default.
+                  }
+                )
             ),
             onPressed: onPressed,
             child: Container(
               width: double.infinity,
               height: 50,
               child: Center(
-                child: Text(text, style: TextStyle( fontSize: 16 ), ),
+                child: Text(text, style: TextStyle( fontSize: 16, color: Colors.white ), ),
               ),
             ),
           );
