@@ -42,7 +42,7 @@ class AuthService with ChangeNotifier {
     };
 
     var url = Uri.http(Environment.apiUrl, '/api/login');
-    print(url);
+
     final res = await http.post( url, 
       body: jsonEncode(data),
       headers: {
@@ -50,7 +50,6 @@ class AuthService with ChangeNotifier {
       }
     );
 
-    print(res.body);
     autenticando = false;
 
     if ( res.statusCode == 200 ) {
@@ -76,7 +75,7 @@ class AuthService with ChangeNotifier {
       };
 
       var url = Uri.http(Environment.apiUrl, '/api/login/new');
-      print(url);
+
       final res = await http.post( url, 
         body: jsonEncode(data),
         headers: {
@@ -84,7 +83,6 @@ class AuthService with ChangeNotifier {
         }
       );
 
-      print(res.body);
       autenticando = false;
 
       if ( res.statusCode == 200 ) {
@@ -103,7 +101,6 @@ class AuthService with ChangeNotifier {
     final token = await _storage.read(key: 'token');
 
     var url = Uri.http(Environment.apiUrl, '/api/login/renew');
-    print(url);
 
     final res = await http.get( url, 
       headers: {
@@ -111,8 +108,6 @@ class AuthService with ChangeNotifier {
         'x-token': token ?? 'No Token'
       }
     );
-
-    print(res.body);
 
     if ( res.statusCode == 200 ) {
       final loginResponse = loginResponseFromJson(res.body);
