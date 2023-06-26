@@ -1,8 +1,13 @@
 import 'dart:io';
-
-import 'package:chat/widgets/chat_message.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import 'package:chat/services/auth-service.dart';
+import 'package:chat/services/chat_service.dart';
+import 'package:chat/services/socket_service.dart';
+
+import 'package:chat/widgets/chat_message.dart';
+import 'package:provider/provider.dart';
 
 
 class ChatPage extends StatefulWidget {
@@ -17,12 +22,43 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin{
   final _textController = TextEditingController();
   final _focusNode = FocusNode();
 
+  ChatService? chatService;
+  SocketService? socketService;
+  AuthService? authService;
+
   final List<ChatMessage> _messages = [];
 
   bool _estaEscribiendo = false;
 
   @override
+  void initState() {
+    super.initState();
+    chatService = Provider.of<ChatService>(context, listen: false);
+    socketService = Provider.of<SocketService>(context, listen: false);
+    authService = Provider.of<AuthService>(context, listen: false);
+
+    socketService!.socket!.on('personal-message', _listenMessage);
+  }
+
+  void _listenMessage( dynamic payload ) {
+    ChatMessage message = ChatMessage(
+      texto: payload['message'], 
+      uid: payload['from'], 
+      animationController: AnimationController(vsync: this, duration: Duration( milliseconds: 300 ))
+    );
+
+    setState(() {
+      _messages.insert(0, message);
+    });
+
+    message.animationController.forward();
+  }
+
+  @override
   Widget build(BuildContext context) {
+
+    final usuarioTo = chatService!.usuarioTo;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -30,12 +66,12 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin{
           children: [
             SizedBox( height: 3 ),
             CircleAvatar(
-              child: Text('TE', style: TextStyle( fontSize: 12 )),
+              child: Text(usuarioTo!.nombre.substring(0,2) , style: TextStyle( fontSize: 12 )),
               backgroundColor: Colors.blue[100],
               maxRadius: 13,
             ),
             SizedBox( height: 3 ),
-            Text('Melisa flores', style: TextStyle( color: Colors.black87, fontSize: 10 ),)
+            Text(usuarioTo!.nombre, style: TextStyle( color: Colors.black87, fontSize: 10 ),)
           ],
         ),
         centerTitle: true,
@@ -92,7 +128,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin{
               margin: EdgeInsets.symmetric( horizontal: 4.0 ),
               child: Platform.isIOS 
               ? CupertinoButton(
-                  child: Text('Enviar'),
+                  child: Text('Enviar', style: TextStyle( color: Colors.black54 )),
                   onPressed: _estaEscribiendo 
                       ? () => _handleSubmit(_textController.text.trim()) 
                       : null,
@@ -125,7 +161,6 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin{
 
     if ( text.length == 0 ) return;
 
-    print(text);
     _textController.clear();
     _focusNode.requestFocus();
 
@@ -144,6 +179,12 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin{
     setState(() {
       _estaEscribiendo = false;
     });
+
+    socketService!.emit!('personal-message', {
+      'from' : authService!.usuario!.uid,
+      'to': chatService!.usuarioTo!.uid,
+      'message': text
+    });
   }
   
   void validateIsTypping( String value ) {
@@ -158,10 +199,10 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin{
 
   @override
   void dispose() {
-    // TODO: Off of socket
     for( ChatMessage message in _messages ) {
       message.animationController.dispose();
     }
+    socketService!.socket!.off('personal-message');
     super.dispose();
   }
 

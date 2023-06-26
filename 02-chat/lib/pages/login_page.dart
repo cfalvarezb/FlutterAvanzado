@@ -9,6 +9,7 @@ import 'package:chat/widgets/labels.dart';
 import 'package:chat/widgets/boton_azul.dart';
 
 import 'package:chat/services/auth-service.dart';
+import 'package:chat/services/socket_service.dart';
 
 class LoginPage extends StatelessWidget {
 
@@ -53,6 +54,7 @@ class _FormState extends State<_Form> {
   Widget build(BuildContext context) {
 
     final authService = Provider.of<AuthService>(context);
+    final socketService = Provider.of<SocketService>(context);
 
     return Container(
         margin: EdgeInsets.only( top: 40 ),
@@ -78,6 +80,7 @@ class _FormState extends State<_Form> {
                 final loginOk =  await authService.login(emailCtrl.text.trim(), passCtrl.text.trim());
 
                 if (loginOk ) {
+                  socketService.connect();
                   Navigator.pushReplacementNamed(context, 'usuarios');
                 } else {
                   showAlert(context, 'Login Incorrecto', 'Revise sus credenciales nuevamente.', 'OK');    
