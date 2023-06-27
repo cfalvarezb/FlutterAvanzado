@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:chat/models/messages_response.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -38,6 +39,8 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin{
     authService = Provider.of<AuthService>(context, listen: false);
 
     socketService!.socket!.on('personal-message', _listenMessage);
+
+    _loadHistory( chatService!.usuarioTo!.uid );
   }
 
   void _listenMessage( dynamic payload ) {
@@ -167,7 +170,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin{
     final newMessage = ChatMessage(
       texto: 
       text, 
-      uid: '123',
+      uid: authService!.usuario!.uid,
       animationController: AnimationController(
         vsync: this,
         duration: Duration( milliseconds: 400 )
@@ -204,6 +207,22 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin{
     }
     socketService!.socket!.off('personal-message');
     super.dispose();
+  }
+  
+  void _loadHistory(String userID) async {
+    List<Message> chat = await chatService!.getChat(userID);
+    final history = chat.map((m) => ChatMessage(
+      texto: m.message, 
+      uid: m.from, 
+      animationController: AnimationController(vsync: this, duration: Duration(
+        microseconds: 0
+      ))..forward()
+    )
+    );
+
+    setState(() {
+      _messages.insertAll(0, history);
+    });
   }
 
 }
