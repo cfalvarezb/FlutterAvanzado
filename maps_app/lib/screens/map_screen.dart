@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:maps_app/blocs/location/location_bloc.dart';
+import 'package:maps_app/views/views.dart';
+import 'package:maps_app/widgets/widgets.dart';
 
 class MapScreen extends StatefulWidget {
 
@@ -37,11 +40,25 @@ class _MapScreenState extends State<MapScreen> {
       body: BlocBuilder<LocationBloc, LocationState>(builder: ( context, state ){
         
         if ( state.lastKnownLocation == null ) return const Center( child: Text('Espere por favar...'), );
-        return Container(
-          alignment: Alignment.center,
-          child: Text('${state.lastKnownLocation!.latitude}, ${ state.lastKnownLocation!.longitude }'),
+        
+        return SingleChildScrollView (
+          child: Stack(
+            children: [
+              MapView( initialLocation: state.lastKnownLocation! )
+          
+              // TODO: botones...
+            ],
+          ),
         );
-      })
+
+      }),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: const Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          BtnCurrentLocation()
+        ],
+      ),
     );
 
   }
