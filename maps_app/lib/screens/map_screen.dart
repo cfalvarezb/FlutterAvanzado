@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:maps_app/blocs/location/location_bloc.dart';
+import 'package:maps_app/blocs/map/map_bloc.dart';
 import 'package:maps_app/views/views.dart';
+import 'package:maps_app/widgets/btn_toggle_user_route.dart';
 import 'package:maps_app/widgets/widgets.dart';
 
 class MapScreen extends StatefulWidget {
@@ -37,18 +40,33 @@ class _MapScreenState extends State<MapScreen> {
   Widget build( BuildContext context ) {
 
     return Scaffold(
-      body: BlocBuilder<LocationBloc, LocationState>(builder: ( context, state ){
+      body: BlocBuilder<LocationBloc, LocationState>(builder: ( context, locationState ){
         
-        if ( state.lastKnownLocation == null ) return const Center( child: Text('Espere por favar...'), );
+        if ( locationState.lastKnownLocation == null ) {
+          return const Center( child: Text('Espere par favar...'), );
+        }
         
-        return SingleChildScrollView (
-          child: Stack(
-            children: [
-              MapView( initialLocation: state.lastKnownLocation! )
-          
-              // TODO: botones...
-            ],
-          ),
+        return BlocBuilder<MapBloc, MapState>(
+          builder: (context, mapState) {
+
+            Map<String, Polyline> polylines = Map.from( mapState.polylines );
+            if ( !mapState.showMyroute ) {
+              polylines.removeWhere((key, value) => key == 'myRoute');
+            }
+
+            return SingleChildScrollView (
+              child: Stack(
+                children: [
+                  MapView( 
+                    initialLocation: locationState.lastKnownLocation!,
+                    polylines: polylines.values.toSet()
+                  ),
+                  const CustomSearchBar(),
+                  const ManualMarker()
+                ],
+              ),
+            );
+          }
         );
 
       }),
@@ -56,7 +74,9 @@ class _MapScreenState extends State<MapScreen> {
       floatingActionButton: const Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          BtnCurrentLocation()
+          BtnToggleUserRoute(),
+          BtnFollowUser(),
+          BtnCurrentLocation(),
         ],
       ),
     );
