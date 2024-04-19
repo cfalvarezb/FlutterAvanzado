@@ -24,7 +24,7 @@ class CustomSearchBar extends StatelessWidget {
 }
 
 class _CustomSearchBarBody extends StatelessWidget {
-  const _CustomSearchBarBody({super.key});
+  const _CustomSearchBarBody();
 
   void onSearchResults ( BuildContext context, SearchResult result ) {
 

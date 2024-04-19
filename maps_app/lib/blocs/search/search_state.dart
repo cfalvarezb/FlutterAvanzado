@@ -14,6 +14,7 @@ class SearchState extends Equatable {
     displayManualMarker: displayManualMarker ?? this.displayManualMarker
   );
 
+  @override
   List<Object> get props => [ displayManualMarker ];
 
 }

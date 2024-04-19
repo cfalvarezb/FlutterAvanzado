@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:maps_app/blocs/blocs.dart';
+import 'package:maps_app/themes/themes.dart';
 
 class MapView extends StatelessWidget {
 
@@ -20,7 +23,7 @@ class MapView extends StatelessWidget {
 
     final mapBloc = BlocProvider.of<MapBloc>(context);
 
-    final initialCameraPosition =  CameraPosition(
+    final CameraPosition initialCameraPosition =  CameraPosition(
       target: initialLocation,
       zoom: 15
     );
@@ -34,18 +37,16 @@ class MapView extends StatelessWidget {
         onPointerMove: ( pointerMoveEvent ) => mapBloc.add( OnStopFollowingUserEvent() ),
         child: GoogleMap(
           initialCameraPosition: initialCameraPosition,
-          compassEnabled: true,
+          compassEnabled: false,
           myLocationEnabled: true,
-          myLocationButtonEnabled: false,
-          mapType: MapType.normal,
           zoomControlsEnabled: false,
-
+          myLocationButtonEnabled: false,
           polylines: polylines,
+
           onMapCreated: ( controller ) => mapBloc.add( OnMapInitializedEvent(controller) ),
-        
-          //TODO: Markers
-          //TODO: Polylines
-          //TODO: When do the map moves?
+          onCameraMove: ( position ) => mapBloc.mapCenter = position.target,
+
+          style: jsonEncode(uberMapTheme),
         ),
       ),
     );

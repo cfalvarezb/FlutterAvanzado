@@ -10,8 +10,7 @@ abstract class MapEvent extends Equatable {
 class OnMapInitializedEvent extends MapEvent {
 
   final GoogleMapController controller;
-
-  OnMapInitializedEvent(this.controller);
+  const OnMapInitializedEvent(this.controller);
 
 }
 
@@ -24,3 +23,8 @@ class UpdateUserPolylineEvent extends MapEvent {
 }
 
 class OnToggleUserRoute extends MapEvent {}
+
+class DisplayPolylineEvent extends MapEvent {
+  final Map<String, Polyline> polylines;
+  const DisplayPolylineEvent(this.polylines);
+}

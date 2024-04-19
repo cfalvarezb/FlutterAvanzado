@@ -8,9 +8,6 @@ class SearchResult {
     this.manual = false
   });
 
-  //TODO:
-  // name, description, location
-
   @override
   String toString() {
     return '{  cancel: $cancel, manual: $manual}';

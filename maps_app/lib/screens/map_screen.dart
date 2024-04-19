@@ -31,7 +31,6 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     locationBloc.close();
     super.dispose();
   }
