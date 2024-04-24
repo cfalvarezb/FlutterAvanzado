@@ -50,7 +50,7 @@ class _MapScreenState extends State<MapScreen> {
 
             Map<String, Polyline> polylines = Map.from( mapState.polylines );
             if ( !mapState.showMyroute ) {
-              polylines.removeWhere((key, value) => key == 'myRoute');
+              polylines.removeWhere((key, value) => (key == 'myRoute' || key == 'route' ));
             }
 
             return SingleChildScrollView (

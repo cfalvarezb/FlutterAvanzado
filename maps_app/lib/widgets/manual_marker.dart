@@ -80,6 +80,7 @@ class _ManualMarkerBody extends StatelessWidget {
 
                   searchBloc.add( OnDeactivateManualMarkerEvent() );
 
+                  if ( !context.mounted ) return;
                   Navigator.pop(context);
                 },
                 child: const Text('Confirmar destino', style: TextStyle( color: Colors.white, fontWeight: FontWeight.w300 )),
