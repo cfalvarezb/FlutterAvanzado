@@ -8,6 +8,8 @@ class PayState {
   final bool activeCard;
   final CreditCardCustom? card;
 
+  String get amountPayString => '${(payAmount ?? 0 * 100).floor()}';
+
   const PayState({
     this.payAmount = 375.55, 
     this.currency = 'USD', 

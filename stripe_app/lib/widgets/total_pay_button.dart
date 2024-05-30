@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:stripe_app/bloc/pay/pay_bloc.dart';
+import 'package:stripe_app/helpers/helpers.dart';
+import 'package:stripe_app/services/stripe_service.dart';
+import 'package:stripe_platform_interface/src/models/payment_methods.dart' as stpe;
 
 class TotalPayButton extends StatelessWidget {
   const TotalPayButton({super.key});
@@ -12,6 +15,7 @@ class TotalPayButton extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final width = MediaQuery.of( context ).size.width;
+    final payBloc = context.read<PayBloc>().state;
 
     return Container(
       width: width,
@@ -28,12 +32,12 @@ class TotalPayButton extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
 
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Total', style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold ),),
-              Text('250.55 USD', style: TextStyle( fontSize: 20 )),
+              const Text('Total', style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold ),),
+              Text('${ payBloc.payAmount } ${ payBloc.currency }', style: const TextStyle( fontSize: 20 )),
             ],
           ),
 
@@ -74,7 +78,35 @@ class _BtnPay extends StatelessWidget {
           Text(' Pay', style: TextStyle( color: Colors.white, fontSize: 22 ),),
         ],
       ),
-      onPressed: (){}
+      onPressed: () async {
+        final stripeService = StripeService();
+        final payBlocState = context.read<PayBloc>().state;
+        final card = state.card;
+        final monthYear = card?.expiracyDate.split('/');
+
+        showLoading(context);
+        
+        final res = await stripeService.payWithExistCard(
+          amount: payBlocState.amountPayString, 
+          currency: payBlocState.currency ?? 'usd', 
+          card: stpe.Card(
+             last4: card!.cardNumber.substring(card.cardNumber.length - 4),
+             expMonth: int.parse(monthYear![0]),
+             expYear: int.parse(monthYear[1])
+          )
+        );
+
+        if ( context.mounted ) {
+          Navigator.pop(context);
+        }
+
+        if ( res.ok && context.mounted ) {
+          showAlert( context, "Tarjeta OK", "Todo correcto");
+        } else if ( context.mounted ) {
+          showAlert( context, "Algo salio mal", res.msg ?? "Nada" );
+        }
+
+      }
     );
   }
 
@@ -95,7 +127,15 @@ class _BtnPay extends StatelessWidget {
           Text(' Pay', style: TextStyle( color: Colors.white, fontSize: 22 ),),
         ],
       ),
-      onPressed: (){}
+      onPressed: () async {
+        final stripeService = StripeService();
+        final payBlocState = context.read<PayBloc>().state;
+
+        final resp = await stripeService.payApplePayGooglePay(
+          amount: payBlocState.amountPayString, 
+          currency: payBlocState.currency ?? ''
+        );
+      }
     );
   }
 }
