@@ -25,9 +25,19 @@ class GoogleSignInService {
       // TODO: Call a rest service to own backend
       final signInWithGoogleEndpoint = Uri(
         scheme: 'https',
-        host: 'apple-google-sign-in.herokuapp.com',
+        host: 'googlesignin-2r08.onrender.com',
         path: '/google'
       );
+
+      final session = await http.post(
+        signInWithGoogleEndpoint,
+        body: {
+          'token': googleKey?.idToken
+        }
+      );
+
+      print('================ Backend ===============');
+      print(session.body);
 
       return account;
     } catch (e) {

@@ -1,6 +1,8 @@
+import 'package:auth_app/services/apple_signin_service.dart';
 import 'package:auth_app/services/google_signin_service.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 void main() => runApp(const MyApp());
 
@@ -56,6 +58,9 @@ class MyApp extends StatelessWidget {
                     //TODO Sign in with google
                     GoogleSignInService.signInWithGoogle();
                   }
+                ),
+                const SignInWithAppleButton(
+                    onPressed: AppleSingInService.signIn
                 )
               ],
             ),
